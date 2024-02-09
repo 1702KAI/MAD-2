@@ -46,24 +46,27 @@ public class MainActivity extends AppCompatActivity {
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (currentUser !=null){
+        if (currentUser != null) {
             String currentUserId = currentUser.getUid();
 
-            databaseReference = FirebaseDatabase.getInstance().getReference("users").child("images");
+            // Update the database reference to point to the images under the specific UID
+            databaseReference = FirebaseDatabase.getInstance().getReference("users").child(currentUserId).child("images");
+
             databaseReference.addValueEventListener(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                                                DataClass dataClass = dataSnapshot.getValue(DataClass.class);
-                                                                dataList.add(dataClass);
-                                                            }
-                                                            adapter.notifyDataSetChanged();
-                                                        }
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    dataList.clear(); // Clear the list before adding new data
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        DataClass dataClass = dataSnapshot.getValue(DataClass.class);
+                        dataList.add(dataClass);
+                    }
+                    adapter.notifyDataSetChanged();
+                }
 
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-                                                        }
+                }
             });
         }
 

@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -60,8 +61,9 @@ public class UploadActivity extends AppCompatActivity {
             currentUserId = currentUser.getUid();
             // Adjust the database reference to include the user ID
             databaseReference = FirebaseDatabase.getInstance().getReference("users").child(currentUserId).child("images");
-        } else{
+        } else {
             Toast.makeText(UploadActivity.this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            finish();
         }
 
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -73,10 +75,12 @@ public class UploadActivity extends AppCompatActivity {
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == Activity.RESULT_OK) {
                             Intent data = result.getData();
-                            imageUri = data.getData();
-                            uploadImage.setImageURI(imageUri);
-                        } else {
-                            Toast.makeText(UploadActivity.this, "No Image Selected", Toast.LENGTH_SHORT).show();
+                            if (data != null) {
+                                imageUri = data.getData();
+                                uploadImage.setImageURI(imageUri);
+                            } else {
+                                Toast.makeText(UploadActivity.this, "No Image Selected", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 }
